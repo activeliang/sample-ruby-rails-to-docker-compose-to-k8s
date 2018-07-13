@@ -1,24 +1,13 @@
-# README
+# kubernetes即k8s集群
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+## 1. 示例项目
 
-Things you may want to cover:
+> 功能: 实时发送及显示消息, 消息会延迟两秒显示
 
-* Ruby version
+### 1.1 聊天室actioncable 和 sidekiq
 
-* System dependencies
+### 1.2 redis 和 sidetiq
 
-* Configuration
+## 2. k8s 功能
 
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+## 3. ansible 功能

@@ -1,0 +1,10 @@
+#!/bin/bash -x
+
+cd $(dirname $0)/../..
+
+trap "pkill -P $$" EXIT
+
+./kube/bin/wait-for $MYSQL_HOST 3306
+./kube/bin/wait-for $REDIS_HOST 6379
+bundle exec rails db:try_migrate
+bundle exec puma -C config/puma.rb

@@ -1,0 +1,6 @@
+server.pem
+server.key
+
+secrets/mysql_env_secret.yaml
+secrets/rails_env_secret.yaml
+secrets/docker_hub_secret.yaml

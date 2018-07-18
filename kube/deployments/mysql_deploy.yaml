@@ -1,0 +1,82 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: amz-selenium-web-mysql
+  labels:
+    app: amz-selenium-web
+    component: mysql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: amz-selenium-web
+      component: mysql
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: amz-selenium-web
+        component: mysql
+    spec:
+      restartPolicy: Always
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: serverType
+                operator: In
+                values:
+                - web-app
+              - key: app
+                operator: In
+                values:
+                - amz-selenium-web
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - amz-selenium-web
+              - key: component
+                operator: In
+                values:
+                - mysql
+            topologyKey: "kubernetes.io/hostname"
+      volumes:
+        - name: mysql-storage
+          persistentVolumeClaim:
+            claimName: amz-selenium-web-mysql
+      initContainers:
+        - name: "remove-lost-found"
+          image: "busybox:1.28.4"
+          command: 
+            - rm
+            - -fr
+            - /var/lib/mysql/lost+found
+          volumeMounts:
+            - name: mysql-storage
+              mountPath: /var/lib/mysql
+      containers:
+        - name: mysql
+          image: mysql:5.7.22
+          ports:
+            - containerPort: 3306
+          livenessProbe:
+            tcpSocket:
+              port: 3306
+          readinessProbe:
+            tcpSocket:
+              port: 3306
+          volumeMounts:
+            - name: mysql-storage
+              mountPath: /var/lib/mysql
+          envFrom:
+            - configMapRef:
+                name: amz-selenium-web-mysql-env
+            - secretRef:
+                name: amz-selenium-web-mysql-env

@@ -28,4 +28,26 @@
 
 # Ignore master key for decrypting credentials and more.
 /config/master.key
-/.idea/*
+/config/credentials.yml.enc
+
+# Ignore public
+/public/uploads/
+/public/localFile/
+!/public/localFile/.keep
+
+# Ignore Mac DS_Store files
+.DS_Store
+
+# Ignore YAML
+/config/application.yml
+/config/initializers/metrics.rb
+
+# Ignore Editor/IDE
+/.vscode
+/.idea
+
+# Ignore dump.rdb
+/dump.rdb
+
+/vendor/bundle
+/.env

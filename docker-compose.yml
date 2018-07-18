@@ -1,0 +1,46 @@
+version: "3"
+services:
+  k8s-ansible-puma:
+    container_name: k8s-ansible-puma
+    image: dmsm_k8s/web
+    build:
+      context: .
+    env_file:
+      - .env
+    ports:
+      - 3000:3000
+    depends_on:
+      - k8s-ansible-mysql
+      - k8s-ansible-redis
+    volumes:
+      - ./tmp/localFile:/app/public/localFile
+      - ./tmp/uploads:/app/public/uploads
+    command: ./kube/bin/setup-db-and-start-puma
+    
+  k8s-ansible-sidekiq:
+    container_name: k8s-ansible-sidekiq
+    image: dmsm_k8s/web
+    env_file:
+      - .env
+    depends_on:
+      - k8s-ansible-puma
+    command: ./kube/bin/start-sidekiq
+    
+  k8s-ansible-mysql:
+    container_name: k8s-ansible-mysql
+    image: mysql:5.7.22
+    ports:
+      - 3306:3306
+    volumes:
+      - ./tmp/mysql:/var/lib/mysql
+    env_file:
+      - .env
+      
+  k8s-ansible-redis:
+    container_name: k8s-ansible-redis
+    image: redis:4.0.10
+    ports:
+      - 6379:6379
+    volumes:
+      - ./tmp/redis:/data
+    command: redis-server --appendonly yes --requirepass $REDIS_PASSWORD

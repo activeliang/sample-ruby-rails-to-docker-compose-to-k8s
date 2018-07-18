@@ -1,0 +1,16 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: amz-selenium-web-redis
+  labels:
+    app: amz-selenium-web
+    component: redis
+spec:
+  ports:
+    - protocol: TCP
+      port: 6379
+  selector:
+    app: amz-selenium-web
+    component: redis
+  type: NodePort

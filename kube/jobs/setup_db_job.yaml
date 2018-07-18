@@ -1,0 +1,26 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: amz-selenium-web-setup-db
+spec:
+  backoffLimit: 4
+  template:
+    metadata:
+      labels:
+        app: amz-selenium-web
+        component: setup-db
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: setup-db
+          image: wellsmuke/amz_selenium_web:1.0.0
+          command:
+            - ./kube/bin/setup-db
+          envFrom:
+            - configMapRef:
+                name: amz-selenium-web-rails-env
+            - secretRef:
+                name: amz-selenium-web-rails-env
+      imagePullSecrets:
+      - name: docker-registry

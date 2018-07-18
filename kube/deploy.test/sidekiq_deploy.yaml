@@ -1,0 +1,38 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: amz-selenium-web-sidekiq
+  labels:
+    app: amz-selenium-web
+    component: sidekiq
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: amz-selenium-web
+      component: sidekiq
+  template:
+    metadata:
+      labels:
+        app: amz-selenium-web
+        component: sidekiq
+    spec:
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 65
+      containers:
+        - name: sidekiq
+          image: amz_selenium/web:1.0.0
+          imagePullPolicy: IfNotPresent
+          command:
+            - ./kube/bin/start-sidekiq
+          livenessProbe:
+            exec:
+              command:
+                - ./kube/bin/health-check-sidekiq
+            initialDelaySeconds: 30
+          envFrom:
+            - configMapRef:
+                name: amz-selenium-web-rails-env
+            - secretRef:
+                name: amz-selenium-web-rails-env

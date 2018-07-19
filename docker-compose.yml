@@ -2,7 +2,7 @@ version: "3"
 services:
   k8s-ansible-puma:
     container_name: k8s-ansible-puma
-    image: dmsm_k8s/web
+    image: k8s-ansible
     build:
       context: .
     env_file:
@@ -19,7 +19,7 @@ services:
     
   k8s-ansible-sidekiq:
     container_name: k8s-ansible-sidekiq
-    image: dmsm_k8s/web
+    image: k8s-ansible
     env_file:
       - .env
     depends_on:

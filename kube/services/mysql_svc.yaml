@@ -2,15 +2,15 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: amz-selenium-web-mysql
+  name: k8s-ansible-mysql
   labels:
-    app: amz-selenium-web
+    app: k8s-ansible
     component: mysql
 spec:
   ports:
     - protocol: TCP
       port: 3306
   selector:
-    app: amz-selenium-web
+    app: k8s-ansible
     component: mysql
   type: NodePort

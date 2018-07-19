@@ -2,9 +2,9 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: amz-selenium-web-puma
+  name: k8s-ansible-puma
   labels:
-    app: amz-selenium-web
+    app: k8s-ansible
     component: puma
 spec:
   type: LoadBalancer
@@ -14,5 +14,5 @@ spec:
       port: 3000
       targetPort: 3000
   selector:
-    app: amz-selenium-web
+    app: k8s-ansible
     component: puma

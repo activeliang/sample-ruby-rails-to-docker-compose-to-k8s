@@ -1,7 +1,7 @@
 SHELL = /bin/bash
 
-export NAMESPACE   := yunbao-staging
-export DOMAIN_NAME := yunbao.muker.io
+export NAMESPACE   := xincheng
+export DOMAIN_NAME := xincheng.today
 
 ifeq ($(TAG),)
 	tag := 1.0.0
@@ -29,8 +29,8 @@ update:
 	$(MAKE) TAG=$(tag) deploy
 
 kubectl-docker-build:
-	if [ "$$(docker image ls -q amz_selenium/web:$(tag))" == "" ]; then \
-		docker build ../ -t amz_selenium/web:$(tag); \
+	if [ "$$(docker image ls -q k8s_ansible/web:$(tag))" == "" ]; then \
+		docker build ../ -t k8s_ansible/web:$(tag); \
 	fi
 
 kubectl-namaspace:
@@ -41,29 +41,29 @@ kubectl-namaspace:
 kubectl-apply-test:
 	cat configmaps/*.yaml  | kubectl -n $(NAMESPACE) apply -f -
 	cat secrets/*.yaml     | kubectl -n $(NAMESPACE) apply -f -
-	cat jobs/*.yaml        | kubectl -n $(NAMESPACE) apply -f -
 	cat deploy.test/*.yaml | kubectl -n $(NAMESPACE) apply -f -
 	cat services/*.yaml    | kubectl -n $(NAMESPACE) apply -f -
-	cat storages/*.yaml    | kubectl -n $(NAMESPACE) apply -f - --validate=false
-	cat volumes/*.yaml     | kubectl -n $(NAMESPACE) apply -f -
-	cat ingresses/*.yaml   | kubectl -n $(NAMESPACE) apply -f -
+	# cat jobs/*.yaml        | kubectl -n $(NAMESPACE) apply -f -
+	# cat storages/*.yaml    | kubectl -n $(NAMESPACE) apply -f - --validate=false
+	# cat volumes/*.yaml     | kubectl -n $(NAMESPACE) apply -f -
+	# cat ingresses/*.yaml   | kubectl -n $(NAMESPACE) apply -f -
 
 kubectl-apply:
 	cat configmaps/*.yaml  | kubectl -n $(NAMESPACE) apply -f -
 	cat secrets/*.yaml     | kubectl -n $(NAMESPACE) apply -f -
-	cat jobs/*.yaml        | kubectl -n $(NAMESPACE) apply -f -
 	cat deployments/*.yaml | kubectl -n $(NAMESPACE) apply -f -
 	cat services/*.yaml    | kubectl -n $(NAMESPACE) apply -f -
-	cat storages/*.yaml    | kubectl -n $(NAMESPACE) apply -f - --validate=false
-	cat volumes/*.yaml     | kubectl -n $(NAMESPACE) apply -f -
-	cat ingresses/*.yaml   | kubectl -n $(NAMESPACE) apply -f -
+	# cat jobs/*.yaml        | kubectl -n $(NAMESPACE) apply -f -
+	# cat storages/*.yaml    | kubectl -n $(NAMESPACE) apply -f - --validate=false
+	# cat volumes/*.yaml     | kubectl -n $(NAMESPACE) apply -f -
+	# cat ingresses/*.yaml   | kubectl -n $(NAMESPACE) apply -f -
 
 kubectl-rollout-status:
-	kubectl -n $(NAMESPACE) rollout status deploy amz-selenium-web-puma
-	kubectl -n $(NAMESPACE) rollout status deploy amz-selenium-web-sidekiq
+	kubectl -n $(NAMESPACE) rollout status deploy k8s-ansible-puma
+	kubectl -n $(NAMESPACE) rollout status deploy k8s-ansible-sidekiq
 
 kubectl-service:
-	kubectl -n $(NAMESPACE) get service amz-selenium-web-puma
+	kubectl -n $(NAMESPACE) get service k8s-ansible-puma
 
 kubectl-delete:
 	cat secrets/*.yaml     | kubectl -n $(NAMESPACE) delete -f - --ignore-not-found
@@ -78,10 +78,10 @@ kubectl-delete:
 	# kubectl delete namespaces $(NAMESPACE) --ignore-not-found
 
 deploy:
-	kubectl -n $(NAMESPACE) set image deploy/amz-selenium-web-puma puma=amz_selenium/web:$(tag)
-	kubectl -n $(NAMESPACE) set image deploy/amz-selenium-web-sidekiq sidekiq=amz_selenium/web:$(tag)
-	kubectl -n $(NAMESPACE) rollout status deploy amz-selenium-web-puma
-	kubectl -n $(NAMESPACE) rollout status deploy amz-selenium-web-sidekiq
+	kubectl -n $(NAMESPACE) set image deploy/k8s-ansible-puma puma=k8s_ansible/web:$(tag)
+	kubectl -n $(NAMESPACE) set image deploy/k8s-ansible-sidekiq sidekiq=k8s_ansible/web:$(tag)
+	kubectl -n $(NAMESPACE) rollout status deploy k8s-ansible-puma
+	kubectl -n $(NAMESPACE) rollout status deploy k8s-ansible-sidekiq
 
 setup-ingress-nginx:
 	kubectl -n $(NAMESPACE) apply  -f nginx/ingress-controller.yaml
@@ -90,4 +90,4 @@ delete-ingress-nginx:
 	kubectl -n $(NAMESPACE) delete -f nginx/ingress-controller.yaml --ignore-not-found
 
 stern:
-	stern amz-selenium-web.*
+	stern k8s-ansible.*

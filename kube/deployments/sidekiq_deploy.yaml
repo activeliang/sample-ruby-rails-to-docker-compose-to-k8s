@@ -2,27 +2,27 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: amz-selenium-web-sidekiq
+  name: k8s-ansible-sidekiq
   labels:
-    app: amz-selenium-web
+    app: k8s-ansible
     component: sidekiq
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: amz-selenium-web
+      app: k8s-ansible
       component: sidekiq
   template:
     metadata:
       labels:
-        app: amz-selenium-web
+        app: k8s-ansible
         component: sidekiq
     spec:
       restartPolicy: Always
       terminationGracePeriodSeconds: 65
       containers:
         - name: sidekiq
-          image: wellsmuke/amz_selenium_web:1.0.0
+          image: k8s_ansible:1.0.0
           imagePullPolicy: IfNotPresent
           command:
             - ./kube/bin/start-sidekiq
@@ -33,9 +33,9 @@ spec:
             initialDelaySeconds: 30
           envFrom:
             - configMapRef:
-                name: amz-selenium-web-rails-env
+                name: k8s-ansible-rails-env
             - secretRef:
-                name: amz-selenium-web-rails-env
+                name: k8s-ansible-rails-env
       imagePullSecrets:
       - name: docker-registry
       affinity:
@@ -46,7 +46,7 @@ spec:
               - key: app
                 operator: In
                 values:
-                - amz-selenium-web
+                - k8s-ansible
               - key: component
                 operator: In
                 values:
@@ -59,7 +59,7 @@ spec:
               - key: app
                 operator: In
                 values:
-                - amz-selenium-web
+                - k8s-ansible
               - key: component
                 operator: In
                 values:

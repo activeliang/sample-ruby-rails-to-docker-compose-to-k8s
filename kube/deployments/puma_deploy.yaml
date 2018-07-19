@@ -2,30 +2,30 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: amz-selenium-web-puma
+  name: k8s-ansible-puma
   labels:
-    app: amz-selenium-web
+    app: k8s-ansible
     component: puma
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: amz-selenium-web
+      app: k8s-ansible
       component: puma
   template:
     metadata:
       labels:
-        app: amz-selenium-web
+        app: k8s-ansible
         component: puma
     spec:
       restartPolicy: Always
       volumes:
         - name: uploads-storage
           persistentVolumeClaim:
-            claimName: amz-selenium-web-uploads
+            claimName: k8s-ansible-uploads
       containers:
         - name: puma
-          image: wellsmuke/amz_selenium_web:1.0.0
+          image: k8s-ansible:1.0.0
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 3000
@@ -43,9 +43,9 @@ spec:
           #   initialDelaySeconds: 30
           envFrom:
             - configMapRef:
-                name: amz-selenium-web-rails-env
+                name: k8s-ansible-rails-env
             - secretRef:
-                name: amz-selenium-web-rails-env
+                name: k8s-ansible-rails-env
           volumeMounts:
             - name: uploads-storage
               mountPath: /app/public/uploads
@@ -59,7 +59,7 @@ spec:
               - key: app
                 operator: In
                 values:
-                - amz-selenium-web
+                - k8s-ansible
               - key: component
                 operator: In
                 values:
@@ -72,7 +72,7 @@ spec:
               - key: app
                 operator: In
                 values:
-                - amz-selenium-web
+                - k8s-ansible
               - key: component
                 operator: In
                 values:

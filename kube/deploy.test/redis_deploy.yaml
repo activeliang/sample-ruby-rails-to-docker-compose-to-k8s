@@ -2,29 +2,29 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: amz-selenium-web-redis
+  name: k8s-ansible-redis
   labels:
-    app: amz-selenium-web
+    app: k8s-ansible
     component: redis
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: amz-selenium-web
+      app: k8s-ansible
       component: redis
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
-        app: amz-selenium-web
+        app: k8s-ansible
         component: redis
     spec:
       restartPolicy: Always
       volumes:
         - name: redis-storage
           persistentVolumeClaim:
-            claimName: amz-selenium-web-redis
+            claimName: k8s-ansible-redis
       containers:
         - name: redis
           image: redis:4.0.10
@@ -47,4 +47,4 @@ spec:
             - $(REDIS_PASSWORD)
           envFrom:
             - secretRef:
-                name: amz-selenium-web-rails-env
+                name: k8s-ansible-rails-env

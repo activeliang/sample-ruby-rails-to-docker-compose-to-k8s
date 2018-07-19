@@ -2,29 +2,29 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: amz-selenium-web-mysql
+  name: k8s-ansible-mysql
   labels:
-    app: amz-selenium-web
+    app: k8s-ansible
     component: mysql
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: amz-selenium-web
+      app: k8s-ansible
       component: mysql
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
-        app: amz-selenium-web
+        app: k8s-ansible
         component: mysql
     spec:
       restartPolicy: Always
       volumes:
         - name: mysql-storage
           persistentVolumeClaim:
-            claimName: amz-selenium-web-mysql
+            claimName: k8s-ansible-mysql
       initContainers:
         - name: "remove-lost-found"
           image: "busybox:1.28.4"
@@ -51,6 +51,6 @@ spec:
               mountPath: /var/lib/mysql
           envFrom:
             - configMapRef:
-                name: amz-selenium-web-mysql-env
+                name: k8s-ansible-mysql-env
             - secretRef:
-                name: amz-selenium-web-mysql-env
+                name: k8s-ansible-mysql-env

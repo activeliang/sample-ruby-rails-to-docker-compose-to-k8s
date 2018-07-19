@@ -2,15 +2,15 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: amz-selenium-web-rails-env
+  name: k8s-ansible-rails-env
 data:
   RAILS_SERVE_STATIC_FILES: 'true'
   RAILS_LOG_TO_STDOUT: 'true'
   SIDEKIQ_TIMEOUT: '60'
   KAMINARI_PER_PAGE: '30'
-  MYSQL_HOST: amz-selenium-web-mysql
+  MYSQL_HOST: k8s-ansible-mysql
   MYSQL_PORT: '3306'
-  MYSQL_USER: amz-selenium-web
-  MYSQL_DATABASE: amz_selenium_web_production
-  REDIS_HOST: amz-selenium-web-redis
+  MYSQL_USER: k8s-ansible
+  MYSQL_DATABASE: dmsm_k8s_ansible_production
+  REDIS_HOST: k8s-ansible-redis
   REDIS_PORT: '6379'

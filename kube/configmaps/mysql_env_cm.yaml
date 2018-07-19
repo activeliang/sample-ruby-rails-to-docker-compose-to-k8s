@@ -2,8 +2,8 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: amz-selenium-web-mysql-env
+  name: k8s-ansible-mysql-env
 data:
-  MYSQL_USER: amz-selenium-web
+  MYSQL_USER: k8s-ansible
   MYSQL_PORT: '3306'
-  MYSQL_DATABASE: amz_selenium_web_production
+  MYSQL_DATABASE: dmsm_k8s_ansible_production

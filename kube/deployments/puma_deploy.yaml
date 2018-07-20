@@ -25,7 +25,7 @@ spec:
             claimName: k8s-ansible-uploads
       containers:
         - name: puma
-          image: k8s-ansible:1.0.0
+          image: k8s_ansible/web:1.0.0
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 3000

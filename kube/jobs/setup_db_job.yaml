@@ -2,25 +2,25 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: amz-selenium-web-setup-db
+  name: k8s-ansible-setup-db
 spec:
   backoffLimit: 4
   template:
     metadata:
       labels:
-        app: amz-selenium-web
+        app: k8s-ansible
         component: setup-db
     spec:
       restartPolicy: Never
       containers:
         - name: setup-db
-          image: wellsmuke/amz_selenium_web:1.0.0
+          image: k8s_ansible/web:1.0.0
           command:
             - ./kube/bin/setup-db
           envFrom:
             - configMapRef:
-                name: amz-selenium-web-rails-env
+                name: k8s-ansible-rails-env
             - secretRef:
-                name: amz-selenium-web-rails-env
-      imagePullSecrets:
-      - name: docker-registry
+                name: k8s-ansible-rails-env
+#      imagePullSecrets:
+#      - name: docker-registry

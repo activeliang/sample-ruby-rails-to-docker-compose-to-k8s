@@ -4,6 +4,8 @@
 
 > 功能: 实时发送及显示消息, 消息会延迟两秒显示
 
+![](https://ws4.sinaimg.cn/large/006tKfTcgy1ftggt8bdsog30fn09umxx.gif)
+
 ### 1.1 聊天室actioncable 和 sidekiq
 
 Aaron教程: dmxs_websocket 之 actioncable 入门 (七)_聊天室
@@ -14,9 +16,20 @@ Aaron教程: dmxs_websocket 之 actioncable 入门 (七)_聊天室
 
 ## 2. docker-compose: 验证dockerfile是否跑通
 
+### 2.0 开始前的准备
+
+1) 复制云豹项目的 .env、Dockerfile、.ignore、.dockerignore、yarn.lock 文件用于 docker-compose 改造
+
+2) 复制云豹项目的 kube 文件夹用于 k8s 改造
+
+3) mac上开启 docker-edge 版本后,要把 kubenetes 选项改为 docker-for-desktop 而不是按教程用 minikube。这样会更接近生产环境。
+
+![](https://ws2.sinaimg.cn/large/006tKfTcgy1ftg4zu28v0j30br0a8dg3.jpg)
+
+
 参考日本教程第二章: https://chopschips.net/blog/2018/05/30/docker-compose-with-rails/
 
-### 2.1 修改的文档总共有:
+### 2.1 日本教程修改的文档总共有:
 
 ```
 Dockerfile
@@ -50,11 +63,11 @@ docker-compose ps
 open http://localhost:3000/
 ```
 
-### 2.3 报错解决思路:
+### 2.3 报错 error:
 
-mysql报错: name@host.com问题, 删除 /app/tmp/mysql, 然后重新开启容器
+1) mysql报错: name@host.com问题, 删除 /app/tmp/mysql, 然后重新开启容器,否则会一直沿用旧配置,会一致报错。
 
-mysql、sidekiq(redis)、puma 环境变量问题: 修改 .env 文件内的环境变量, 然后重新开启容器
+2) mysql、sidekiq(redis)、puma 环境变量问题: 修改 .env 文件内的环境变量, 然后重新开启容器
 
 
 
@@ -62,7 +75,7 @@ mysql、sidekiq(redis)、puma 环境变量问题: 修改 .env 文件内的环境
 
 参考日本教程第三章: https://chopschips.net/blog/2018/05/30/kubernetes-tutorial/
 
-### 3.1 修改的文档总共有:
+### 3.1 日本教程修改的文档总共有:
 
 ```
 k8s/manifests-step0/mysql-deploy.yaml
@@ -112,7 +125,7 @@ http://localhost:8001/api/v1/namespaces/kube-system/services/https:kubernetes-da
 
 参考日本教程第四章: https://chopschips.net/blog/2018/05/30/kubernetes-with-rails/#mysql-env-secret-yaml-mysql%E3%81%AE%E7%92%B0%E5%A2%83%E5%A4%89%E6%95%B0%E7%94%A8Secret
 
-### 4.1 修改的文档总共有:
+### 4.1 日本教程修改的文档总共有:
 
 ```
 k8s/manifests-step1/mysql-deploy.yaml
@@ -173,12 +186,95 @@ $ make kubectl-delete
 # 本地环境一键部署
 $ make test
 
-# 一键部署
-$ make all
+# 一键清除
+$ make clean
+
+# 删除命名空间
+$ kubectl delete namespaces xxxx --ignore-not-found
 ```
 
 3) 效果如下图: 每个模块各新增四个api对象
 
 ![](https://ws3.sinaimg.cn/large/006tNc79gy1ftfgerpbjnj31kw0t5abh.jpg)
+
+## 5.k8s 四种进阶 api 对象(job、pv、pvc、ingress)
+
+参考日本教程第五章: https://chopschips.net/blog/2018/05/30/practical-kubernetes-with-rails/
+
+### 5.1 日本教程修改的文档总共有:
+
+```
+lib/tasks/db.rake
+./bin/start-puma
+./bin/setup-db
+
+# 新增job的api，用Makefile滚动更新
+k8s/manifests-step2/Makefile
+k8s/manifests-step2/setup-db-job.yaml
+
+# pvc对象
+k8s/manifests-step2/Makefile
+k8s/manifests-step3/mysql-pvc.yaml
+k8s/manifests-step3/redis-pvc.yaml
+k8s/manifests-step3/mysql-deploy.yaml
+k8s/manifests-step3/redis-deploy.yaml
+
+# ingress对象
+k8s/manifests-step2/Makefile
+k8s/manifests-step4/openssl.conf
+k8s/manifests-step4/puma-ing.yml
+```
+
+### 5.2 用到的命令:
+
+1) job对象、滚动更新
+
+```
+# 创建 api
+cat services/*.yaml | kubectl apply -f -
+
+# 滚动更新
+make update TAG=1.0.1
+```
+
+2) pv、pvc、ingress 对象
+
+# 查看 pv 和 pvc
+kubectl -n xincheng get pvc
+kubectl -n xincheng get pv
+
+
+### 5.3 报错 error:
+
+1) web页面 persistentvolumeclaim "k8s-ansible-mysql" not found
+
+![](https://ws3.sinaimg.cn/large/006tNc79gy1ftfkij03rsj31g40qo76h.jpg)
+
+解决办法：要把 storages 和 volumes 文件夹里的 storageClassName 改成统一，比如 hostpath。
+
+2) web页面 Back-off restarting failed container
+
+原因：一是 docker hub 上找不到镜像，二是 secret 配置不正确。
+
+解决办法：页面查看log，分别定位到 master_key 和 redis_host 的问题。
+
+查看 kube/secrets/rails_env_secret.yaml，修改 master_key。
+
+查看 kube/secrets/rails_env_secret.yaml，复制 REDIS_URL，在 app/config 搜索，看是否被使用，能搜索到 cable.yml，所以要修改配置。配置 redis 名字、密码要跟 configmap 里的一致。
+
+> 注意:
+>
+> 本地测试不用配置 docker hub， 如果是线上版本，可以参考并配置 secrets 文件 https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+>
+> 即使删除了 namespace, pv 持久卷仍然存在,不知道要怎么删除。
+
+
+3) 完成,打开 k8s 仪表页面
+
+![](https://ws1.sinaimg.cn/large/006tKfTcgy1ftgguvwesaj31g40qoq51.jpg)
+
+打开项目
+
+![](https://ws4.sinaimg.cn/large/006tKfTcgy1ftggt8bdsog30fn09umxx.gif)
 
 ## 4. ansible 一键部署

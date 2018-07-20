@@ -41,22 +41,22 @@ kubectl-namaspace:
 kubectl-apply-test:
 	cat configmaps/*.yaml  | kubectl -n $(NAMESPACE) apply -f -
 	cat secrets/*.yaml     | kubectl -n $(NAMESPACE) apply -f -
+	cat jobs/*.yaml        | kubectl -n $(NAMESPACE) apply -f -
 	cat deploy.test/*.yaml | kubectl -n $(NAMESPACE) apply -f -
 	cat services/*.yaml    | kubectl -n $(NAMESPACE) apply -f -
-	# cat jobs/*.yaml        | kubectl -n $(NAMESPACE) apply -f -
-	# cat storages/*.yaml    | kubectl -n $(NAMESPACE) apply -f - --validate=false
-	# cat volumes/*.yaml     | kubectl -n $(NAMESPACE) apply -f -
-	# cat ingresses/*.yaml   | kubectl -n $(NAMESPACE) apply -f -
+	cat storages/*.yaml    | kubectl -n $(NAMESPACE) apply -f - --validate=false
+	cat volumes/*.yaml     | kubectl -n $(NAMESPACE) apply -f -
+	cat ingresses/*.yaml   | kubectl -n $(NAMESPACE) apply -f -
 
 kubectl-apply:
 	cat configmaps/*.yaml  | kubectl -n $(NAMESPACE) apply -f -
 	cat secrets/*.yaml     | kubectl -n $(NAMESPACE) apply -f -
+	cat jobs/*.yaml        | kubectl -n $(NAMESPACE) apply -f -
 	cat deployments/*.yaml | kubectl -n $(NAMESPACE) apply -f -
 	cat services/*.yaml    | kubectl -n $(NAMESPACE) apply -f -
-	# cat jobs/*.yaml        | kubectl -n $(NAMESPACE) apply -f -
-	# cat storages/*.yaml    | kubectl -n $(NAMESPACE) apply -f - --validate=false
-	# cat volumes/*.yaml     | kubectl -n $(NAMESPACE) apply -f -
-	# cat ingresses/*.yaml   | kubectl -n $(NAMESPACE) apply -f -
+	cat storages/*.yaml    | kubectl -n $(NAMESPACE) apply -f - --validate=false
+	cat volumes/*.yaml     | kubectl -n $(NAMESPACE) apply -f -
+	cat ingresses/*.yaml   | kubectl -n $(NAMESPACE) apply -f -
 
 kubectl-rollout-status:
 	kubectl -n $(NAMESPACE) rollout status deploy k8s-ansible-puma

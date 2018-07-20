@@ -22,7 +22,7 @@ spec:
       terminationGracePeriodSeconds: 65
       containers:
         - name: sidekiq
-          image: k8s_ansible:1.0.0
+          image: k8s_ansible/web:1.0.0
           imagePullPolicy: IfNotPresent
           command:
             - ./kube/bin/start-sidekiq

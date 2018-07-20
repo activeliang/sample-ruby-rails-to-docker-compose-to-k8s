@@ -6,7 +6,7 @@ metadata:
   labels:
     type: local
 spec:
-  storageClassName: standard
+  storageClassName: hostpath
   capacity:
     storage: 8Gi
   accessModes:
@@ -21,7 +21,7 @@ metadata:
   labels:
     type: local
 spec:
-  storageClassName: standard
+  storageClassName: hostpath
   capacity:
     storage: 8Gi
   accessModes:
@@ -36,7 +36,7 @@ metadata:
   labels:
     type: local
 spec:
-  storageClassName: standard
+  storageClassName: hostpath
   capacity:
     storage: 8Gi
   accessModes:

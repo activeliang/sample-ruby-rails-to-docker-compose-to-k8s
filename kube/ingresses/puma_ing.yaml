@@ -2,23 +2,23 @@
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: amz-selenium-web-puma
+  name: k8s-ansible-puma
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
     kubernetes.io/ingress.class: "nginx"
 spec:
   # backend:
-  #   serviceName: amz-selenium-web-puma
+  #   serviceName: k8s-ansible-puma
   #   servicePort: 3000
   # tls:
   # - hosts:
-  #   - amz-selenium-web-puma.local
-  #   secretName: amz-selenium-web-puma-tls
+  #   - k8s-ansible-puma.local
+  #   secretName: k8s-ansible-puma-tls
   rules:
-  - host: yunbao.muker.io
+  - host: xincheng.today
     http:
       paths:
       - backend:
-          serviceName: amz-selenium-web-puma
+          serviceName: k8s-ansible-puma
           servicePort: 3000
         path: /

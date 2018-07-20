@@ -21,8 +21,8 @@ spec:
       restartPolicy: Always
       volumes:
         - name: uploads-storage
-          persistentVolumeClaim:
-            claimName: k8s-ansible-uploads
+#          persistentVolumeClaim:
+#            claimName: k8s-ansible-uploads
       containers:
         - name: puma
           image: k8s_ansible/web:1.0.0

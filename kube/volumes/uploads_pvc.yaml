@@ -2,9 +2,9 @@
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
-  name: amz-selenium-web-uploads
+  name: k8s-ansible-uploads
   labels:
-    app: amz-selenium-web
+    app: k8s-ansible
     component: uploads
 spec:
   accessModes:
@@ -12,4 +12,4 @@ spec:
   resources:
     requests:
       storage: 8Gi
-  storageClassName: standard
+  storageClassName: hostpath

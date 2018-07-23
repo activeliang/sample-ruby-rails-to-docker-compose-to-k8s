@@ -18,11 +18,13 @@ Aaron教程: dmxs_websocket 之 actioncable 入门 (七)_聊天室
 
 ### 2.0 开始前的准备
 
-1) 复制云豹项目的 .env、Dockerfile、.ignore、.dockerignore、yarn.lock 文件用于 docker-compose 改造
+1) 复制云豹项目的 .env、Dockerfile、.ignore、.dockerignore、docker-compose.yml、yarn.lock 文件用于 docker-compose 改造
 
 2) 复制云豹项目的 kube 文件夹用于 k8s 改造
 
 3) mac上开启 docker-edge 版本后,要把 kubenetes 选项改为 docker-for-desktop 而不是按教程用 minikube。这样会更接近生产环境。
+
+4) mac 关闭 mysql 服务
 
 ![](https://ws2.sinaimg.cn/large/006tKfTcgy1ftg4zu28v0j30br0a8dg3.jpg)
 
@@ -48,13 +50,26 @@ config/credentials.yml.enc
 
 ### 2.2 用到的命令:
 
+1) 生成 master.key
+```sh
+# 确保重新生成
+$ rm config/master.key config/credentials.yml.enc
+
+# 重新生成 config/master.key
+$ EDITOR=vim rails credentials:edit
+
+# 加密
+$ echo -n "master_key" | base64
+```
+
+2) 开启容器
 ```
 # 修改配置后，重新开启容器
 docker-compose up -d --build --force-recreate
 
 # 查看容器日志
 docker-compose logs -f puma
-docker-compose -f docker-compose-preview.yml logs -f
+docker-compose -f docker-compose.yml logs -f
 
 # 获取容器列表
 docker-compose ps
@@ -65,9 +80,31 @@ open http://localhost:3000/
 
 ### 2.3 报错 error:
 
-1) mysql报错: name@host.com问题, 删除 /app/tmp/mysql, 然后重新开启容器,否则会一直沿用旧配置,会一致报错。
+1) mysql、sidekiq(redis)、puma 报错logs: rails aborted! ActiveSupport::MessageEncryptor::InvalidMessage: ActiveSupport::MessageEncryptor::InvalidMessage
 
-2) mysql、sidekiq(redis)、puma 环境变量问题: 修改 .env 文件内的环境变量, 然后重新开启容器
+* 关闭 mac 的 mysql 服务
+
+* name@host.com问题, 删除 /app/tmp/mysql, 然后重新开启容器,否则会一直沿用旧配置,会一致报错。
+
+* Dockerfile 里的 RAILS_MASTER_KEY 不要加密成 base64； /kube/secrets/rails_env_secret.yaml 里的 RAILS_MASTER_KEY 才要加密成 base64；
+
+2) mysql、sidekiq(redis)、puma 环境变量问题: 
+
+* 修改 .env 文件内的环境变量, 然后重新开启容器
+
+3) port is already allocated
+
+* 端口被占用,重启 mac,并关闭 mac 的 mysql 服务
+
+4) ERROR: for amz-erp-puma  Cannot start service amz-erp-puma: OCI runtime create failed: container_linux.go:348: starting container process caused "exec: \"./kube/bin/setup-db-and-start-puma\": stat ./kube/bin/setup-db-and-start-puma: no such file or directory": unknown
+   ERROR: for amz-erp-puma  Cannot start service amz-erp-puma: OCI runtime create failed: container_linux.go:348: starting container process caused "exec: \"./kube/bin/setup-db-and-start-puma\": stat ./kube/bin/setup-db-and-start-puma: no such file or directory": unknown
+   ERROR: Encountered errors while bringing up the project.
+
+* 解决办法：把 .dockerignore 里的 /kube/* 去掉，否则开启容器是找不到这个文件夹的
+
+5） docker-compose logs -f amz-erp-sidekiq：Error connecting to Redis on 127.0.0.1:6379 (Errno::ECONNREFUSED)
+
+* .env 的配置没问题，但 config/initializers/sidekiq.rb 的 redis_url 没有引用 ENV['REDIS_URL']
 
 
 
@@ -277,4 +314,4 @@ kubectl -n xincheng get pv
 
 ![](https://ws4.sinaimg.cn/large/006tKfTcgy1ftggt8bdsog30fn09umxx.gif)
 
-## 4. ansible 一键部署
+## 6. ansible 一键部署

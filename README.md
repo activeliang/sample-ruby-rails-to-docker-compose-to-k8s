@@ -152,7 +152,7 @@ kubectl proxy
 http://localhost:8001/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/
 ```
 
-3) 效果如下图: 每个模块各新增了两个api对象
+3) 效果如下图: 每个模块分别新增了api对象
 
 ![](https://ws4.sinaimg.cn/large/006tNc79gy1ftfgia9aa5j31g40qo771.jpg)
 
@@ -184,9 +184,21 @@ k8s/manifests-step1/Makefile
 lib/tasks/sidekiq.rake
 ```
 
-### 4.2 用到的命令:
+### 4.2 实际修改的文档有： 
+```
+# 以下文件夹批量修改名字，和镜像名字
+kube/deploy.test  
+kube/deployments
+kube/services
+kube/configmaps
 
-1) 逐个命令测试
+# 涉及密码的文件夹，按照 .env 逐个修改，注意 k8s 密码要加密为 base64
+kube/secrets
+```
+
+### 4.3 用到的命令:
+
+4.3.1 逐个命令测试
 
 ```
 # 创建 api
@@ -202,8 +214,7 @@ cat services/*.yaml | kubectl apply -f -
 kubectl rollout status deploy demoapp-puma
 ```
 
-2) 制作 Makefile
-
+4.3.2 制作 Makefile， 手动测试
 ```
 # 先进入 `kube` 目录
 $ cd kube
@@ -219,7 +230,13 @@ $ make kubectl-rollout-status
 
 # 删除所有部署配置
 $ make kubectl-delete
+```
 
+4.3.3 制作 Makefile， 一键测试
+
+* 先注解掉 Makefile 里 kubectl-apply-test、kubectl-apply、kubectl-delete 对应的四个进阶 api （jobs、storages、volumes、ingresses）
+
+```
 # 本地环境一键部署
 $ make test
 
@@ -230,7 +247,7 @@ $ make clean
 $ kubectl delete namespaces xxxx --ignore-not-found
 ```
 
-3) 效果如下图: 每个模块各新增四个api对象
+4.3.4 效果如下图: 每个模块各新增四个api对象
 
 ![](https://ws3.sinaimg.cn/large/006tNc79gy1ftfgerpbjnj31kw0t5abh.jpg)
 
@@ -264,32 +281,49 @@ k8s/manifests-step4/puma-ing.yml
 
 ### 5.2 用到的命令:
 
-1) job对象、滚动更新
+5.2.1 job对象、滚动更新
 
 ```
 # 创建 api
-cat services/*.yaml | kubectl apply -f -
+make test
 
 # 滚动更新
 make update TAG=1.0.1
 ```
 
-2) pv、pvc、ingress 对象
+5.2.2 pv、pvc、ingress 对象
 
-# 查看 pv 和 pvc
+STEP1 修改 kube/volumes 文件的 storageClassName（持久卷声明）， storageClassName 要对应到 kube/storages 的持久卷配置里的 name。 
+
+STEP2 取消 Makefile 对（jobs、storages、volumes、ingresses）的注解，执行
+
+```
+# 生成 api 对象
+make test
+
+# 查看 pv 和 pvc，其中 xincheng 替换成命名空间名字
 kubectl -n xincheng get pvc
 kubectl -n xincheng get pv
+```
 
+5.2.3 完成,打开 k8s 仪表页面
+
+![](https://ws1.sinaimg.cn/large/006tKfTcgy1ftgguvwesaj31g40qoq51.jpg)
+
+打开项目
+
+![](https://ws4.sinaimg.cn/large/006tKfTcgy1ftggt8bdsog30fn09umxx.gif)
 
 ### 5.3 报错 error:
 
-1) web页面 persistentvolumeclaim "k8s-ansible-mysql" not found
+5.3.1 web页面 persistentvolumeclaim "k8s-ansible-mysql" not found
 
 ![](https://ws3.sinaimg.cn/large/006tNc79gy1ftfkij03rsj31g40qo76h.jpg)
 
 解决办法：要把 storages 和 volumes 文件夹里的 storageClassName 改成统一，比如 hostpath。
 
-2) web页面 Back-off restarting failed container
+
+5.3.2 web页面 Back-off restarting failed container
 
 原因：一是 docker hub 上找不到镜像，二是 secret 配置不正确。
 
@@ -306,12 +340,5 @@ kubectl -n xincheng get pv
 > 即使删除了 namespace, pv 持久卷仍然存在,不知道要怎么删除。
 
 
-3) 完成,打开 k8s 仪表页面
-
-![](https://ws1.sinaimg.cn/large/006tKfTcgy1ftgguvwesaj31g40qoq51.jpg)
-
-打开项目
-
-![](https://ws4.sinaimg.cn/large/006tKfTcgy1ftggt8bdsog30fn09umxx.gif)
 
 ## 6. ansible 一键部署

@@ -1,4 +1,4 @@
-# kubernetes即k8s集群
+# rails 项目改写为 docker-compose 和 k8s
 
 ## 1. 示例项目
 
